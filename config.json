@@ -1,0 +1,18 @@
+{
+  "config": {
+    "etcd_host": "jp.debug.com",
+    "etcd_port": 2379,
+    "controller_host": "jp.debug.com",
+    "controller_port": "6888",
+    "bsid_prefix": "fc00:1:999::"
+  },
+  "sla": [
+    {
+      "decap_sid":"fc00:2::a",
+      "source":"RouterA",
+      "dest": "RouterB",
+      "method": "latency",
+      "extra": {}
+    }
+  ]
+}
