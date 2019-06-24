@@ -88,7 +88,7 @@ class EtcdHelper(object):
         def build_url():
             return "http://{}:{}/{}/watch".format(self.ip,self.port,self.api)
 
-        async with aiohttp.ClientSession() as session:
+        async with aiohttp.ClientSession(read_timeout=0) as session:
             async with session.post(build_url(),data='{"create_request": {"key":"%s"} }' % self.encode(key)) as resp:
                 if resp.status>=300:
                     raise Exception("Error")

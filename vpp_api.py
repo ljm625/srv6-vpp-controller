@@ -73,20 +73,35 @@ class VppPolicyApi(object):
         r = self.vpp.connect("Vppclient")
         print("VPP api opened with code: %s" % r)
 
-    def dump_sr_policies(self):
-        print("Sending dump interfaces. Msg id: sw_interface_dump")
+    def dump_sr_policies(self,debug=True):
+        sr_bsid_list=[]
         for policy in self.vpp.api.sr_policies_dump():
-            print(policy)
-            print(ipaddress.IPv6Address(policy.bsid.addr))
-            print("===================")
+            if debug:
+                print(policy)
+                print(ipaddress.IPv6Address(policy.bsid.addr))
+                print("===================")
+            sr_bsid_list.append(ipaddress.IPv6Address(policy.bsid.addr))
+        return sr_bsid_list
 
     def insert_sr_policies(self,bsid, sid_list, weight=1):
         sids = []
         for sid in sid_list:
             sids.append({"addr": ipaddress.IPv6Address(sid).packed})
         sids.extend([{"addr": ipaddress.IPv6Address(u"0::0").packed}] * (16 - len(sids)))
-        self.vpp.api.sr_policy_add(bsid_addr=ipaddress.IPv6Address(bsid).packed, is_encap=1, type=0, fib_table=0,
-                              sids={"num_sids": len(sid_list), "weight": weight, "sids": sids})
+        bsid_list = self.dump_sr_policies(debug=False)
+        if ipaddress.IPv6Address(bsid) in bsid_list:
+            self.delete_sr_policies(bsid)
+            self.vpp.api.sr_policy_add(bsid_addr=ipaddress.IPv6Address(bsid).packed, is_encap=1, type=0, fib_table=0,
+                                  sids={"num_sids": len(sid_list), "weight": weight, "sids": sids})
+        else:
+            self.vpp.api.sr_policy_add(bsid_addr=ipaddress.IPv6Address(bsid).packed, is_encap=1, type=0, fib_table=0,
+                                  sids={"num_sids": len(sid_list), "weight": weight, "sids": sids})
+
+    def delete_sr_policies(self,bsid):
+        self.vpp.api.sr_policy_del(bsid_addr = {"addr": ipaddress.IPv6Address(bsid).packed})
+
+    def add_sr_steering(self,bsid):
+        pass
 
 
 # if __name__ == '__main__':

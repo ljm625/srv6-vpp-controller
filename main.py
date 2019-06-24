@@ -47,7 +47,7 @@ class MainLogic(object):
             for sla in (self.hash(self.sla) - self.hash(self.calculated_sla)):
                 sla_dict=json.loads(sla)
                 print(sla_dict)
-                await self.calculate_route(sla_dict)
+                await self.calculate_route(sla_dict,cache=False)
             # First check if exist in etcd.
             self.old_config=self.config
             await asyncio.sleep(10)
@@ -56,12 +56,12 @@ class MainLogic(object):
 
 
 
-    async def calculate_route(self,sla):
+    async def calculate_route(self,sla, cache=True):
 
         # First check etcd, if not exist, then api, finally watch
         key = "{}__{}__{}__{}".format(sla["source"],sla["dest"],sla["method"],json.dumps(sla["extra"]))
         result = await self.etcd.get(key)
-        if result:
+        if result and cache:
             # Start watch task
             result=json.loads(result)
         else:

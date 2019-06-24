@@ -1,3 +1,5 @@
+import json
+
 import aiohttp
 
 
@@ -30,8 +32,8 @@ class ControllerApiHelper(object):
                 if resp.status>=300:
                     raise Exception("Error")
                 else:
-                    result = await resp.json()
-                    return result
+                    result = await resp.text()
+                    return json.loads(result)["sid_list"]
 
 
 
