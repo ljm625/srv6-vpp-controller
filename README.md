@@ -52,7 +52,7 @@ vi config.json
 }
 ```
 
-Modify the config file, replace the config 
+Modify the config file, replace the config:
 
 - etcd_host : The ETCD database hostname
 
@@ -84,3 +84,15 @@ The list contains:
 ### Run
 
 python3 main.py
+
+
+
+### Other modules
+
+https://github.com/ljm625/srv6-vpp-controller - This repo, the VPP Agent module
+
+https://github.com/ljm625/xr-srv6-etcd - The Agent for fetching SID info
+
+https://github.com/ljm625/xr-srv6-controller - The Agent for calculating the route
+
+https://github.com/ljm625/ios-xr-etcd - The IOS XR version ETCD database docker
