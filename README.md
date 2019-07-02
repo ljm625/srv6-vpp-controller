@@ -96,3 +96,5 @@ https://github.com/ljm625/xr-srv6-etcd - The Agent for fetching SID info
 https://github.com/ljm625/xr-srv6-controller - The Agent for calculating the route
 
 https://github.com/ljm625/ios-xr-etcd - The IOS XR version ETCD database docker
+
+https://github.com/ljm625/srv6_vpp_demo_controller The Centralized version (Currently guide in Chinese)

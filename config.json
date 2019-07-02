@@ -20,6 +20,13 @@
       "dest": "SR-PCE",
       "method": "latency",
       "extra": {}
+    },
+    {
+      "decap_sid":"fc00:3::a",
+      "source":"RouterB",
+      "dest": "SR-PCE",
+      "method": "latency",
+      "extra": {}
     }
   ]
 }
