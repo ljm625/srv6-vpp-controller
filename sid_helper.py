@@ -20,7 +20,7 @@ class SidHelper(object):
                     "interface": sid_info["interface"],
                     "gateway": sid_info["gateway"]
                 }
-                await self.etcd.put(sid_info["ip_range"],json.dumps(data))
+                await self.etcd.put("{}_{}".format(sid_info["ip_range"],sid_info["vrf_name"]),json.dumps(data))
             else:
                 print("ERROR : {} could not create".format(bsid))
             index=index+1

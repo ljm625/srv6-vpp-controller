@@ -46,7 +46,8 @@ vi config.json
       "source":"RouterA",
       "dest": "RouterB",
       "method": "latency",
-      "extra": {}
+      "extra": {},
+      "vrf_name": "c1"
     }
   ],
   "sid": [
@@ -54,13 +55,15 @@ vi config.json
       "interface": "GigabitEthernet0/4/0",
       "action": "end.dx4",
       "gateway": "10.0.1.1",
-      "ip_range": "10.0.1.0/24"
+      "ip_range": "10.0.1.0/24",
+      "vrf_name": "c1"
     },
     {
       "interface": "GigabitEthernet0/5/0",
       "action": "end.dx4",
       "gateway": "10.0.2.1",
-      "ip_range": "10.0.2.0/24"
+      "ip_range": "10.0.2.0/24",
+      "vrf_name": "c1"
     }
   ]
 
@@ -97,6 +100,8 @@ The list contains:
 
 - dest_ip : The destination IP range for this SLA requirements. Can be IPv4 or IPv6
 
+- vrf_name : The VRF name for the SLA requirements, need to match remote VPP's SID vrf name.
+
 SID Part:
 
 SID Part defines the End.DX related local SID on VPP.
@@ -107,7 +112,7 @@ The list contains:
 - gateway: the gateway to forward the decapsulate packet to.
 - ip_range : the IPv4/IPv6 range behind the gateway
 - interface : the interface to forward the decapsulate packet.
-
+- vrf_name : The VRF name for the SID requirements.
 
 ### Run
 

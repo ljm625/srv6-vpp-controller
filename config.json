@@ -11,13 +11,15 @@
       "interface": "GigabitEthernet0/4/0",
       "action": "end.dx4",
       "gateway": "10.0.1.1",
-      "ip_range": "10.0.1.0/24"
+      "ip_range": "10.0.1.0/24",
+      "vrf_name": "c1"
     },
     {
       "interface": "GigabitEthernet0/5/0",
       "action": "end.dx4",
       "gateway": "10.0.2.1",
-      "ip_range": "10.0.2.0/24"
+      "ip_range": "10.0.2.0/24",
+      "vrf_name": "c1"
     }
   ],
   "sla": [
@@ -26,6 +28,7 @@
       "source":"RouterA",
       "dest": "RouterB",
       "method": "latency",
+      "vrf_name": "c1",
       "extra": {}
     },
     {
@@ -33,6 +36,7 @@
       "source":"RouterA",
       "dest": "SR-PCE",
       "method": "latency",
+      "vrf_name": "c1",
       "extra": {}
     }
   ]

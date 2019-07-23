@@ -81,14 +81,16 @@ class MainLogic(object):
             self.calculated_sla.index(sla)
         except ValueError:
             self.calculated_sla.append(sla)
-        decap_sid = await self.query_decap_sid(sla["dest_ip"])
+        decap_sid = await self.query_decap_sid(sla["dest_ip"],sla["vrf_name"])
         sid_list.append(decap_sid)
         print("INFO : Updating BSID: {}{}".format(self.config["bsid_prefix"],self.calculated_sla.index(sla)+1))
         self.vpp.insert_sr_policies("{}{}".format(self.config["bsid_prefix"],self.calculated_sla.index(sla)+1),sid_list)
         self.vpp.add_steering("{}{}".format(self.config["bsid_prefix"],self.calculated_sla.index(sla)+1),sla["dest_ip"].split('/')[0],int(sla["dest_ip"].split('/')[1]))
 
-    async def query_decap_sid(self,ip_range):
-        result =await self.etcd.get(ip_range)
+    async def query_decap_sid(self,ip_range,vrf_name):
+        result =await self.etcd.get("{}_{}".format(ip_range,vrf_name))
+        if not result:
+            raise Exception("ERROR : Error occured in program! The defined ip range not found.")
         return json.loads(result)["sid"]
 
     def create_watch_task(self,coro):
