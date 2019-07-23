@@ -42,7 +42,7 @@ vi config.json
   },
   "sla": [
     {
-      "decap_sid":"fc00:2::a",
+      "dest_ip":"10.1.1.0/24",
       "source":"RouterA",
       "dest": "RouterB",
       "method": "latency",
@@ -62,7 +62,7 @@ vi config.json
       "gateway": "10.0.2.1",
       "ip_range": "10.0.2.0/24"
     }
-  ],
+  ]
 
 }
 ```
@@ -94,6 +94,8 @@ The list contains:
 - method : The method to calculate the path, latency or te or igp
 
 - extra : The extra parameters, like do not pass specific node or link
+
+- dest_ip : The destination IP range for this SLA requirements. Can be IPv4 or IPv6
 
 SID Part:
 
