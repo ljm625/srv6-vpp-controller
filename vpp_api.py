@@ -83,6 +83,7 @@ class VppPolicyApi(object):
             sr_bsid_list.append(ipaddress.IPv6Address(policy.bsid.addr))
         return sr_bsid_list
 
+
     def insert_sr_policies(self,bsid, sid_list, weight=1):
         sids = []
         for sid in sid_list:
@@ -102,6 +103,51 @@ class VppPolicyApi(object):
 
     def add_sr_steering(self,bsid):
         pass
+
+    def delete_sid(self,bsid):
+        self.vpp.api.sr_localsid_add_del(is_del=True,localsid={"addr":ipaddress.IPv6Address(bsid).packed})
+
+
+    def create_sid(self,bsid,type,interface,nexthop):
+        behaviour=0
+        if type=="end.dx4":
+            behaviour=7
+        elif type =="end.dx6":
+            behaviour=6
+
+        intf_list=self.dump_interfaces()
+        intf_index=0
+        for intf in intf_list:
+            if interface in intf:
+                intf_index=intf_list.index(intf)
+
+        self.vpp.api.sr_localsid_add_del(is_del=False,localsid={"addr":ipaddress.IPv6Address(bsid).packed},behavior=behaviour,sw_if_index=intf_index,nh_addr4=ipaddress.IPv4Address(nexthop).packed,end_psp=0,fib_table=0)
+        return True
+
+    def dump_localsid(self):
+        for sid in self.vpp.api.sr_localsids_dump():
+            print(sid)
+
+    def dump_interfaces(self):
+        intf_list=[]
+        # print("Sending dump interfaces. Msg id: sw_interface_dump")
+        for intf in self.vpp.api.sw_interface_dump():
+            # print("\tInterface, message id: sw_interface_details, interface index: %s" % intf.interface_name.decode())
+            intf_list.append(intf.interface_name.decode())
+        return intf_list
+
+    def add_steering(self,bsid,prefix_addr,mask):
+
+        # Temporary fix
+        os.system("vppctl sr steer l3 {}/{} via bsid {}".format(prefix_addr,mask,bsid))
+        # Currently having issues because of APIs. Might work in v19.
+        # prefix_addr=ipaddress.ip_address(prefix_addr).packed
+        # result =self.vpp.api.sr_steering_add_del(is_del=False,bsid_addr=ipaddress.IPv6Address(bsid).packed,prefix_addr=prefix_addr,traffic_type=4,mask_width=mask,sw_if_index=0,table_id=0)
+    def dump_steering(self):
+
+        steer_list = self.vpp.api.sr_steering_pol_dump()
+        for steer in steer_list:
+            print(steer)
 
 
 # if __name__ == '__main__':

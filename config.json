@@ -6,24 +6,31 @@
     "controller_port": "9888",
     "bsid_prefix": "fc00:1:999::"
   },
+  "sid": [
+    {
+      "interface": "GigabitEthernet0/4/0",
+      "action": "end.dx4",
+      "gateway": "10.0.1.1",
+      "ip_range": "10.0.1.0/24"
+    },
+    {
+      "interface": "GigabitEthernet0/5/0",
+      "action": "end.dx4",
+      "gateway": "10.0.2.1",
+      "ip_range": "10.0.2.0/24"
+    }
+  ],
   "sla": [
     {
-      "decap_sid":"fc00:2::a",
+      "dest_ip":"10.0.1.0/24",
       "source":"RouterA",
       "dest": "RouterB",
       "method": "latency",
       "extra": {}
     },
     {
-      "decap_sid":"fc00:2::c",
+      "dest_ip":"10.0.2.0/24",
       "source":"RouterA",
-      "dest": "SR-PCE",
-      "method": "latency",
-      "extra": {}
-    },
-    {
-      "decap_sid":"fc00:3::a",
-      "source":"RouterB",
       "dest": "SR-PCE",
       "method": "latency",
       "extra": {}

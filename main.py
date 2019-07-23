@@ -5,6 +5,7 @@ import json
 
 from controller_api import ControllerApiHelper
 from etcd_helper import EtcdHelper
+from sid_helper import SidHelper
 from vpp_api import VppPolicyApi
 
 
@@ -27,6 +28,7 @@ class MainLogic(object):
             data=json.loads(json_data)
             self.config = data["config"]
             self.sla = data["sla"]
+            self.sid_info = data["sid"]
 
     def check_config(self):
         self.reload_config()
@@ -43,6 +45,9 @@ class MainLogic(object):
                 self.etcd=EtcdHelper(self.config["etcd_host"],self.config["etcd_port"])
                 self.controller = ControllerApiHelper(self.config["controller_host"],self.config["controller_port"])
                 self.vpp = VppPolicyApi()
+                self.sid_helper = SidHelper(self.etcd,self.vpp,self.sid_info)
+                await self.sid_helper.update_sid_to_etcd(self.config["bsid_prefix"])
+
             print("INFO : Application running and updating Policies.")
             for sla in (self.hash(self.sla) - self.hash(self.calculated_sla)):
                 sla_dict=json.loads(sla)
@@ -60,6 +65,7 @@ class MainLogic(object):
 
         # First check etcd, if not exist, then api, finally watch
         key = "{}__{}__{}__{}".format(sla["source"],sla["dest"],sla["method"],json.dumps(sla["extra"]))
+        print("Calculating Route: {}".format(key))
         result = await self.etcd.get(key)
         if result and cache:
             # Start watch task
@@ -67,18 +73,23 @@ class MainLogic(object):
         else:
             # Get result in controller
             result = await self.controller.calculate_path(sla["source"],sla["dest"],sla["method"],sla["extra"])
-        self.update_policy(sla,result)
+        await self.update_policy(sla,result)
         self.create_watch_task(self.etcd.watch(key, sla, self.update_policy))
 
-    def update_policy(self,sla,sid_list):
+    async def update_policy(self,sla,sid_list):
         try:
             self.calculated_sla.index(sla)
         except ValueError:
             self.calculated_sla.append(sla)
-        sid_list.append(sla["decap_sid"])
+        decap_sid = await self.query_decap_sid(sla["dest_ip"])
+        sid_list.append(decap_sid)
         print("INFO : Updating BSID: {}{}".format(self.config["bsid_prefix"],self.calculated_sla.index(sla)+1))
         self.vpp.insert_sr_policies("{}{}".format(self.config["bsid_prefix"],self.calculated_sla.index(sla)+1),sid_list)
-        
+        self.vpp.add_steering("{}{}".format(self.config["bsid_prefix"],self.calculated_sla.index(sla)+1),sla["dest_ip"].split('/')[0],int(sla["dest_ip"].split('/')[1]))
+
+    async def query_decap_sid(self,ip_range):
+        result =await self.etcd.get(ip_range)
+        return json.loads(result)["sid"]
 
     def create_watch_task(self,coro):
         asyncio.ensure_future(coro)
