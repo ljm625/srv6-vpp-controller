@@ -48,7 +48,22 @@ vi config.json
       "method": "latency",
       "extra": {}
     }
-  ]
+  ],
+  "sid": [
+    {
+      "interface": "GigabitEthernet0/4/0",
+      "action": "end.dx4",
+      "gateway": "10.0.1.1",
+      "ip_range": "10.0.1.0/24"
+    },
+    {
+      "interface": "GigabitEthernet0/5/0",
+      "action": "end.dx4",
+      "gateway": "10.0.2.1",
+      "ip_range": "10.0.2.0/24"
+    }
+  ],
+
 }
 ```
 
@@ -79,6 +94,17 @@ The list contains:
 - method : The method to calculate the path, latency or te or igp
 
 - extra : The extra parameters, like do not pass specific node or link
+
+SID Part:
+
+SID Part defines the End.DX related local SID on VPP.
+
+The list contains:
+
+- action : whether this is a end.dx4 or end.dx6 action
+- gateway: the gateway to forward the decapsulate packet to.
+- ip_range : the IPv4/IPv6 range behind the gateway
+- interface : the interface to forward the decapsulate packet.
 
 
 ### Run
